@@ -85,6 +85,7 @@ extension MathLexicon {
 
     func measures(_ text: String) -> String {
         var out = text
+        out = oldMoney(out)
         out = numberWithUnit(out)
         out = slashUnits(out)
         out = numericRanges(out)
@@ -166,6 +167,49 @@ extension MathLexicon {
                 }
             }
             return "\(amount) \(name)"
+        }
+    }
+
+    /// Pre-decimal British money, as Victorian prose writes it: "Twenty-four
+    /// geese at 7s. 6d." → "at 7 shillings and 6 pence"; "£ 88 10s." → "88
+    /// pounds 10 shillings"; "8d." → "8 pence".
+    ///
+    /// Heard, not assumed (2026-09-16, Kokoro af_nova then the recogniser):
+    /// as written these came back "760", "264D" and "TWNTYCVN pounds tens";
+    /// the spelled-out forms came back word for word.
+    ///
+    /// The full stop is part of the notation and is required. A bare shilling
+    /// amount ("12s.") must be one or two digits and not a multiple of ten,
+    /// because "in her 20s." and "the 1960s." are ages and decades; a shilling
+    /// amount with pence or after a pound amount has no such limit. Pence alone
+    /// run 1 to 11. Nothing glued to a letter, a sign or another number is
+    /// read ("B-52s.", "10−32s."). The stop is kept unless a comma, semicolon
+    /// or colon follows, so a sentence still ends where it did.
+    func oldMoney(_ text: String) -> String {
+        guard text.contains("s.") || text.contains("d.") else { return text }
+        let before = #"(?<![\p{L}\p{N}.,$£€−–'’-])"#
+        let after = #"(?=[\s,;:’”'")\]]|$)"#
+        func name(_ n: String, _ unit: Unit) -> String {
+            "\(n) \(n == "1" ? unit.singular : unit.plural)"
+        }
+        func stop(_ m: NSTextCheckingResult, _ ns: NSString) -> String {
+            let end = m.range.location + m.range.length
+            guard end < ns.length else { return "." }
+            return ",;:".contains(ns.substring(with: NSRange(location: end, length: 1))) ? "" : "."
+        }
+        let shillings = before + #"(?:£\s?(\d{1,3}(?:,\d{3})+|\d+)\s)?(\d{1,3})s\.(?:\s?(\d{1,2})d\.)?"# + after
+        let out = replacing(text, shillings) { m, ns in
+            guard let s = group(m, 2, ns), let n = Int(s) else { return nil }
+            let pounds = group(m, 1, ns), pence = group(m, 3, ns)
+            if pounds == nil, pence == nil, s.count > 2 || n % 10 == 0 { return nil }
+            var spoken = pounds.map { name($0, words.pound) + " " } ?? ""
+            spoken += name(s, words.shilling)
+            if let pence { spoken += " \(words.moneyAnd) " + name(pence, words.penny) }
+            return spoken + stop(m, ns)
+        }
+        return replacing(out, before + #"(\d{1,2})d\."# + after) { m, ns in
+            guard let d = group(m, 1, ns), let n = Int(d), (1...11).contains(n) else { return nil }
+            return name(d, words.penny) + stop(m, ns)
         }
     }
 

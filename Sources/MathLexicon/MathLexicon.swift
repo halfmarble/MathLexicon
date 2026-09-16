@@ -119,6 +119,12 @@ public struct MathLexicon: Sendable {
         /// A comparison sign before a number, in prose: "(< 33 °C)".
         public var proseComparisons: [Character: String] = [
             "<": "less than", ">": "more than", "≤": "at most", "≥": "at least"]
+        /// Pre-decimal British money: "7s. 6d." → "7 shillings and 6 pence",
+        /// "£ 88 10s." → "88 pounds 10 shillings".
+        public var pound = Unit("pound", "pounds")
+        public var shilling = Unit("shilling", "shillings")
+        public var penny = Unit("penny", "pence")
+        public var moneyAnd = "and"
 
         public init(equals: String, approximately: String, notEqual: String,
                     lessOrEqual: String, greaterOrEqual: String, less: String,

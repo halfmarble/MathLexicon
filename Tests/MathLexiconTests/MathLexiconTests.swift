@@ -133,6 +133,48 @@ final class MathLexiconTests: XCTestCase {
         ("α- or β-adrenergic", "alpha- or beta-adrenergic"),
     ]
 
+    /// Pre-decimal money, verbatim from the Holmes stories, as whole sentences
+    /// because the full stop is part of the notation.
+    static let oldMoney: [(String, String)] = [
+        ("Twenty-four geese at 7s. 6d.’”", "Twenty-four geese at 7 shillings and 6 pence.’”"),
+        ("My gross takings amount to £ 27 10s. Every day, from nine",
+         "My gross takings amount to 27 pounds 10 shillings. Every day, from nine"),
+        ("amount to £ 88 10s., while he has £ 220 standing",
+         "amount to 88 pounds 10 shillings, while he has £ 220 standing"),
+        ("I had received no less than 26s. 4d.", "I had received no less than 26 shillings and 4 pence."),
+        ("rooms 8s., breakfast 2s. 6d., cocktail 1s., lunch 2s. 6d., glass sherry, 8d.’ I see",
+         "rooms 8 shillings, breakfast 2 shillings and 6 pence, cocktail 1 shilling, lunch 2 shillings and 6 pence, glass sherry, 8 pence.’ I see"),
+        ("of the Alpha, at 12s.’”", "of the Alpha, at 12 shillings.’”"),
+    ]
+
+    /// The nearest things to old money that are not.
+    static let oldMoneyLookAlikes: [String] = [
+        "£10 Reward.",
+        "not less than £ 1000 a year",
+        "in her 20s.",
+        "the 1960s.",
+        "It happened in the 60s.",
+        "Boeing 747s.",
+        "B-52s.",
+        "from 10−35 to about 10−32s.",
+        "a 3D print",
+        "the 12d. pence rule",
+        "his 2nd. attempt",
+        "5s.o.s",
+    ]
+
+    func testOldMoney() {
+        for (written, spoken) in Self.oldMoney {
+            XCTAssertEqual(lexicon.speakable(written), spoken, written)
+        }
+    }
+
+    func testOldMoneyLookAlikesAreUntouched() {
+        for text in Self.oldMoneyLookAlikes {
+            XCTAssertEqual(lexicon.speakable(text), text, "changed a look-alike: \(text)")
+        }
+    }
+
     func testPhrasingsAlone() {
         for (written, spoken) in Self.phrasings {
             XCTAssertEqual(lexicon.speakable(written), spoken, "alone: \(written)")
