@@ -16,6 +16,9 @@ import Foundation
 /// Two symbols are always math and are read wherever they appear: `π`
 /// ("pi") and subscript digits (`H₂O` → "H 2 O").
 ///
+/// Units, ranges, fractions, `×`, comparison signs and lone Greek letters in
+/// prose have their own pass with the same rule — see `Measures.swift`.
+///
 ///     MathLexicon.english.speakable("Einstein wrote E = mc².")
 ///     // "Einstein wrote E equals m c squared."
 ///
@@ -48,7 +51,7 @@ public struct MathLexicon: Sendable {
             cursor = span.upperBound
         }
         out += String(chars[cursor...])
-        return alwaysMath(out)
+        return alwaysMath(measures(out))
     }
 
     /// The reading of one expression, or `nil` when it is not clearly math.
@@ -95,6 +98,27 @@ public struct MathLexicon: Sendable {
         public var symbols: [Character: String]
         /// Function name → spoken lead-in: "sin" → "sine of".
         public var functions: [String: String]
+
+        // Units and symbols in prose (Measures.swift). Plain properties with
+        // English defaults, so a translation overrides them by assignment.
+
+        /// Unit symbol, CASE-SENSITIVE, read only right after a number.
+        public var units: [String: Unit] = MathLexicon.englishUnits
+        /// Units allowed only after a slash: "s" in "m/s", "h" in "km/h".
+        public var denominatorUnits: [String: Unit] = MathLexicon.englishDenominatorUnits
+        public var fractions: [Character: Fraction] = MathLexicon.englishFractions
+        /// "25–36" → "25 to 36".
+        public var rangeTo = "to"
+        /// "4×4" → "4 by 4".
+        public var by = "by"
+        /// "m/s" → "meters per second".
+        public var per = "per"
+        /// "m²" → "square meters", "m³" → "cubic meters".
+        public var square = "square"
+        public var cubic = "cubic"
+        /// A comparison sign before a number, in prose: "(< 33 °C)".
+        public var proseComparisons: [Character: String] = [
+            "<": "less than", ">": "more than", "≤": "at most", "≥": "at least"]
 
         public init(equals: String, approximately: String, notEqual: String,
                     lessOrEqual: String, greaterOrEqual: String, less: String,

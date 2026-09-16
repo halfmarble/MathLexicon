@@ -64,9 +64,6 @@ final class MathLexiconTests: XCTestCase {
         "Wi-Fi",
         "a+b",
         "x < y",
-        "20 m²",
-        "9.8 m/s²",
-        "5 km² of forest",
         "kg·m²",
         "^_^",
         "key=value",
@@ -90,6 +87,50 @@ final class MathLexiconTests: XCTestCase {
         "221B Baker Street",
         "It's 7:15.",
         "= Heading =",
+        // Units and symbols: each is the nearest miss of a reading below.
+        "1200 W Main St",
+        "the 1960 s",
+        "relative density 0.53724 g/cm3",
+        // "$5 m" is money. A bare "5 m budget" DOES read as meters — known limit.
+        "a $5 m budget",
+        "<3",
+        "and/or",
+        "A/B testing",
+        "The Greek σιρός means pit.",
+        "kg·m²",
+        "5 in the morning",
+        "Call 555-1234",
+    ]
+
+    /// Units, ranges, fractions, × and comparison signs in prose — every
+    /// written form here was taken from real reference text.
+    static let measures: [(String, String)] = [
+        ("25–36 kg (55–80 lb)", "25 to 36 kilograms (55 to 80 pounds)"),
+        ("(< 33 °C)", "(less than 33 degrees Celsius)"),
+        ("-5 °C", "minus 5 degrees Celsius"),
+        ("45°–48°", "45 to 48 degrees"),
+        ("1 kg (1000 g)", "1 kilogram (1000 grams)"),
+        ("20 m²", "20 square meters"),
+        ("5 km²", "5 square kilometers"),
+        ("9.8 m/s²", "9.8 meters per second squared"),
+        ("50 km/h", "50 kilometers per hour"),
+        ("m/s", "meters per second"),
+        ("1,200 km", "1,200 kilometers"),
+        ("127 ft (38.7 m)", "127 feet (38.7 meters)"),
+        ("0.1 to 5.0 μm", "0.1 to 5.0 micrometers"),
+        ("500 nm", "500 nanometers"),
+        ("18 amu", "18 atomic mass units"),
+        ("110 kV", "110 kilovolts"),
+        ("5 mL", "5 milliliters"),
+        ("(1792–1852)", "(1792 to 1852)"),
+        ("4½ per cent", "4 and a half per cent"),
+        ("½ mile", "one half mile"),
+        ("4×4", "4 by 4"),
+        ("(> 600 nm)", "(more than 600 nanometers)"),
+        ("≥ 18", "at least 18"),
+        ("the wavelength λ", "the wavelength lambda"),
+        ("the value of ΔH", "the value of delta H"),
+        ("α- or β-adrenergic", "alpha- or beta-adrenergic"),
     ]
 
     func testPhrasingsAlone() {
@@ -105,6 +146,20 @@ final class MathLexiconTests: XCTestCase {
             XCTAssertEqual(lexicon.speakable("The answer is \(written)."),
                            "The answer is \(spoken).", "before a full stop: \(written)")
         }
+    }
+
+    func testMeasures() {
+        for (written, spoken) in Self.measures {
+            XCTAssertEqual(lexicon.speakable(written), spoken, "alone: \(written)")
+            XCTAssertEqual(lexicon.speakable("We saw \(written) there."),
+                           "We saw \(spoken) there.", "in a sentence: \(written)")
+        }
+    }
+
+    /// A range whose two ends carry DIFFERENT units is not a range this pass
+    /// can read, and is left whole rather than half-read. Known gap.
+    func testMixedUnitRangeIsLeftAlone() {
+        XCTAssertEqual(lexicon.speakable("from 5 m–10 cm"), "from 5 m–10 cm")
     }
 
     func testSymbols() {

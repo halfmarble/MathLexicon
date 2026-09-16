@@ -37,6 +37,37 @@ Swift, Foundation only, no dependencies. iOS 15, macOS 12, tvOS 15, watchOS 8, v
 Numbers stay as digits. Every speech engine already reads digits, and apps disagree about how
 ("3.14" as "three point one four" or "three point fourteen"), so that choice is left to you.
 
+## Units and symbols in prose
+
+A second pass reads measurements and symbols in ordinary sentences, with the same rule: a reading
+needs something that makes it unambiguous.
+
+| written | spoken |
+|---|---|
+| `25–36 kg (55–80 lb)` | 25 to 36 kilograms (55 to 80 pounds) |
+| `(< 33 °C)` | (less than 33 degrees Celsius) |
+| `45°–48°` | 45 to 48 degrees |
+| `9.8 m/s²`, `20 m²` | 9.8 meters per second squared, 20 square meters |
+| `The SI unit for velocity is m/s.` | …is meters per second. |
+| `(1792–1852)` | (1792 to 1852) |
+| `4½ per cent` | 4 and a half per cent |
+| `4×4` | 4 by 4 |
+| `the wavelength λ`, `ΔH` | the wavelength lambda, delta H |
+
+- **A unit is read only right after a number** (`5 m`), or as a slash compound whose halves are
+  both units (`m/s`). Unit symbols are case-sensitive.
+- **Single capitals are not units.** In `1200 W Main St` the W is West, and N, S, E, A, V and L
+  collide the same way. `s` is not a unit either (`the 1960 s`), except after a slash.
+- **A range needs an en dash** between numbers (`1792–1852`), or a unit after it. An ASCII hyphen
+  between bare numbers is a score or a phone number (`3-2 win`, `555-1234`).
+- **A comparison sign needs a space and then a number**: `< 33` is read; `<3` and `a <= b` are not.
+- **A lone Greek letter is read**, and so is one followed by a single letter (`Δx`). A Greek word
+  (`σιρός`) is left alone.
+- A compound the table cannot read whole (`g/cm3`) is left whole rather than half-read.
+
+Known limits: `5 m budget` reads as meters (only `$5 m` is recognised as money), and a range whose
+ends carry different units (`5 m–10 cm`) is left unread.
+
 ## What it leaves alone
 
 **This is the design, not a limitation.** A span is rewritten only if it is clearly an equation:
