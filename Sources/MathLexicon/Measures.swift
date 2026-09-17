@@ -86,6 +86,7 @@ extension MathLexicon {
     func measures(_ text: String) -> String {
         var out = text
         out = oldMoney(out)
+        out = coordinates(out)
         out = numberWithUnit(out)
         out = slashUnits(out)
         out = numericRanges(out)
@@ -197,7 +198,9 @@ extension MathLexicon {
             guard end < ns.length else { return "." }
             return ",;:".contains(ns.substring(with: NSRange(location: end, length: 1))) ? "" : "."
         }
-        let shillings = before + #"(?:£\s?(\d{1,3}(?:,\d{3})+|\d+)\s)?(\d{1,3})s\.(?:\s?(\d{1,2})d\.)?"# + after
+        // Pence after shillings may drop its stop before a comma: "£1 17s. 9d,
+        // amount of overplus" (Dracula) was heard "17 shillings 9D".
+        let shillings = before + #"(?:£\s?(\d{1,3}(?:,\d{3})+|\d+)\s)?(\d{1,3})s\.(?:\s?(\d{1,2})d(?:\.|(?=,)))?"# + after
         let out = replacing(text, shillings) { m, ns in
             guard let s = group(m, 2, ns), let n = Int(s) else { return nil }
             let pounds = group(m, 1, ns), pence = group(m, 3, ns)
@@ -210,6 +213,25 @@ extension MathLexicon {
         return replacing(out, before + #"(\d{1,2})d\."# + after) { m, ns in
             guard let d = group(m, 1, ns), let n = Int(d), (1...11).contains(n) else { return nil }
             return name(d, words.penny) + stop(m, ns)
+        }
+    }
+
+    /// Latitude and longitude in degrees, minutes and seconds: "39°50′N 98°35′W"
+    /// → "39 degrees 50 minutes north 98 degrees 35 minutes west". Heard as
+    /// written it came back "Axa and W"; spelled out, word for word (2026-09-16).
+    /// Needs the prime (′ or ') AND a compass letter, so "45°" and "5′ 10″" are
+    /// not coordinates.
+    func coordinates(_ text: String) -> String {
+        guard text.contains("°") else { return text }
+        let num = #"(\d+(?:\.\d+)?)"#
+        let pattern = #"(?<![\p{L}\p{N}.])(\d{1,3})°\s?"# + num + #"[′']\s?(?:"# + num + #"[″"]\s?)?([NSEW])(?![\p{L}\p{N}])"#
+        return replacing(text, pattern) { m, ns in
+            guard let d = group(m, 1, ns), let mi = group(m, 2, ns),
+                  let point = group(m, 4, ns)?.first, let dir = words.compassPoints[point] else { return nil }
+            func name(_ n: String, _ unit: Unit) -> String { "\(n) \(n == "1" ? unit.singular : unit.plural)" }
+            var spoken = name(d, words.arcDegree) + " " + name(mi, words.arcMinute)
+            if let se = group(m, 3, ns) { spoken += " " + name(se, words.arcSecond) }
+            return spoken + " " + dir
         }
     }
 

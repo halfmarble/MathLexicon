@@ -125,6 +125,12 @@ public struct MathLexicon: Sendable {
         public var shilling = Unit("shilling", "shillings")
         public var penny = Unit("penny", "pence")
         public var moneyAnd = "and"
+        /// Latitude and longitude: "39°50′N" → "39 degrees 50 minutes north".
+        public var arcDegree = Unit("degree", "degrees")
+        public var arcMinute = Unit("minute", "minutes")
+        public var arcSecond = Unit("second", "seconds")
+        public var compassPoints: [Character: String] = [
+            "N": "north", "S": "south", "E": "east", "W": "west"]
 
         public init(equals: String, approximately: String, notEqual: String,
                     lessOrEqual: String, greaterOrEqual: String, less: String,

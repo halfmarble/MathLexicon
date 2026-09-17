@@ -145,6 +145,8 @@ final class MathLexiconTests: XCTestCase {
         ("rooms 8s., breakfast 2s. 6d., cocktail 1s., lunch 2s. 6d., glass sherry, 8d.’ I see",
          "rooms 8 shillings, breakfast 2 shillings and 6 pence, cocktail 1 shilling, lunch 2 shillings and 6 pence, glass sherry, 8 pence.’ I see"),
         ("of the Alpha, at 12s.’”", "of the Alpha, at 12 shillings.’”"),
+        ("to return cheque £1 17s. 9d, amount of overplus",
+         "to return cheque 1 pound 17 shillings and 9 pence, amount of overplus"),
     ]
 
     /// The nearest things to old money that are not.
@@ -162,6 +164,26 @@ final class MathLexiconTests: XCTestCase {
         "his 2nd. attempt",
         "5s.o.s",
     ]
+
+    /// Verbatim from the geography packs.
+    static let coordinates: [(String, String)] = [
+        ("is located at 39°50′N 98°35′W, about 2.6 miles",
+         "is located at 39 degrees 50 minutes north 98 degrees 35 minutes west, about 2.6 miles"),
+        ("South Dakota at 44°58′2.08″N 103°46′17.60″W.",
+         "South Dakota at 44 degrees 58 minutes 2.08 seconds north 103 degrees 46 minutes 17.60 seconds west."),
+        ("from each island at 168°58′37″ W.", "from each island at 168 degrees 58 minutes 37 seconds west."),
+        ("on the meridian at 71°32′N 180°0′E, also", "on the meridian at 71 degrees 32 minutes north 180 degrees 0 minutes east, also"),
+    ]
+
+    func testCoordinates() {
+        for (written, spoken) in Self.coordinates {
+            XCTAssertEqual(lexicon.speakable(written), spoken, written)
+        }
+        // The nearest look-alikes: a plain angle, a height, a range of degrees.
+        XCTAssertEqual(lexicon.speakable("a 45° angle"), "a 45 degrees angle")
+        XCTAssertEqual(lexicon.speakable("He was 5′ 10″ tall"), "He was 5′ 10″ tall")
+        XCTAssertEqual(lexicon.speakable("45°–48°"), "45 to 48 degrees")
+    }
 
     func testOldMoney() {
         for (written, spoken) in Self.oldMoney {
