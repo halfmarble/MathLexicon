@@ -105,6 +105,10 @@ MathLexicon(words: words).speakable("E=mc²")   // "E égale m c au carré"
 
 ## Contributing
 
+`docs/ARCHITECTURE.md` explains how the reader is put together — the three passes and why their
+order is load-bearing, why a span is declined, and the constraints you cannot move without
+breaking a reading. Read it before changing anything in `Sources/`.
+
 The tests are two tables in `Tests/MathLexiconTests/MathLexiconTests.swift`:
 
 - **`phrasings`**: written math and what a person says. Each row is checked on its own, mid-sentence
