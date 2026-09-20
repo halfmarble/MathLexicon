@@ -84,6 +84,12 @@ unchanged. A formula read slightly wrong is a small miss. Prose rewritten into m
 `π` and subscript digits are the exception: they have no prose reading, so they are read wherever
 they appear.
 
+## Using it
+
+```swift
+.package(url: "https://github.com/halfmarble/MathLexicon.git", from: "1.0.0")
+```
+
 ## API
 
 ```swift
