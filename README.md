@@ -109,11 +109,16 @@ MathLexicon(words: words).speakable("E=mc²")   // "E égale m c au carré"
 order is load-bearing, why a span is declined, and the constraints you cannot move without
 breaking a reading. Read it before changing anything in `Sources/`.
 
-The tests are two tables in `Tests/MathLexiconTests/MathLexiconTests.swift`:
+The tests are tables in `Tests/MathLexiconTests/MathLexiconTests.swift`. Two of them carry most
+of the work:
 
 - **`phrasings`**: written math and what a person says. Each row is checked on its own, mid-sentence
   and before a full stop.
 - **`lookAlikes`**: text that must come back byte-for-byte unchanged.
+
+The rest are the same pairing on a narrower subject: `measures` and `symbols` for units and symbols
+in prose, `oldMoney` and `oldMoneyLookAlikes` for pre-decimal British money, and `coordinates` for
+written latitude and longitude.
 
 The most useful contribution is a row. When you add a reading, add its nearest look-alike too: every
 rule that widens what counts as math has to show what it still leaves alone. A pull request that

@@ -1,9 +1,9 @@
 import XCTest
 @testable import MathLexicon
 
-/// Two tables. To contribute, add a row: a phrasing and what a person would
-/// say, or a look-alike that must come back unchanged. A reading you add to
-/// the first table should come with its nearest look-alike in the second.
+/// Tables of readings, and tables of look-alikes. To contribute, add a row: a
+/// phrasing and what a person would say, or a look-alike that must come back
+/// unchanged. A reading you add should come with its nearest look-alike.
 final class MathLexiconTests: XCTestCase {
 
     let lexicon = MathLexicon.english
@@ -165,7 +165,7 @@ final class MathLexiconTests: XCTestCase {
         "5s.o.s",
     ]
 
-    /// Verbatim from the geography packs.
+    /// Written coordinates, taken verbatim from real reference text.
     static let coordinates: [(String, String)] = [
         ("is located at 39°50′N 98°35′W, about 2.6 miles",
          "is located at 39 degrees 50 minutes north 98 degrees 35 minutes west, about 2.6 miles"),
